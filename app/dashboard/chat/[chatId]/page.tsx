@@ -191,7 +191,7 @@ type IncomingMessage= {
   };
 
   if (authLoading) return <div className="flex-1 flex items-center justify-center text-gray-500 p-6">Loading authentication...</div>;
-  if (!user) { router.push('/login'); return <div className="flex-1 flex items-center justify-center text-gray-500 p-6">Redirecting to login...</div>; }
+  if (!user) { router.push('/signin'); return <div className="flex-1 flex items-center justify-center text-gray-500 p-6">Redirecting to login...</div>; }
   if (loadingMessages && messages.length === 0) return <div className="flex-1 flex items-center justify-center"><ArrowPathIcon className="h-8 w-8 text-green-500 animate-spin"/></div>;
 
   return (
@@ -279,7 +279,6 @@ type IncomingMessage= {
                 <svg xmlns="http://www.w3.org/2000/svg" className="inline h-3.5 w-3.5 mr-1 -ml-0.5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" /></svg>
                 Private Note
             </button>
-            <span className="text-xs text-gray-400 ml-auto tabular-nums">17925</span>
         </div>
         <form onSubmit={handleSendMessage} className="flex items-center space-x-2.5">
           <input
