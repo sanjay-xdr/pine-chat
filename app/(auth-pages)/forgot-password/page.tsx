@@ -89,7 +89,7 @@ console.log(searchParams)
           </div>
           
           {/* Display general form messages/errors */}
-          {!("message" in searchParams && searchParams.type === "success") && (
+          {!("message" in searchParams && searchParams.message === "success") && (
              <FormMessage message={searchParams} />
           )}
         </form>
