@@ -111,6 +111,7 @@ type IncomingMessage= {
         .order('created_at', { ascending: true });
 
       if (error) { console.error('Error fetching messages:', error); }
+      //@ts-ignore
       else { setMessages(data as Message[] || []); }
       setLoadingMessages(false);
       setTimeout(() => scrollToBottom("auto"), 100);
