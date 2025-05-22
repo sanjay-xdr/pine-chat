@@ -13,7 +13,6 @@ interface EnrichedChat extends Chat {
   last_message_content?: string;
   last_message_sender_id?: string;
   last_message_at?: string;
-  unread_count?: number;
   tags?: { name: string, color: string }[];
   is_muted?: boolean;
 }
@@ -68,6 +67,7 @@ export default function ChatList() {
       } else {
         const enrichedChats = chatDetails?.map((chat, index) => {
           const otherParticipantProfile = chat.chat_participants
+          //@ts-ignore
             .find(p => p.profiles?.id !== user.id)?.profiles;
           const lastMessage = chat.messages && chat.messages.length > 0 ? chat.messages[0] : null;
           
@@ -96,7 +96,7 @@ export default function ChatList() {
 
     fetchChats();
   }, [user, supabase]);
-
+console.log(chats ," this is chats")
   if (loading) return (
     <div className="p-4 text-center text-gray-500">
       <ArrowPathIcon className="h-6 w-6 animate-spin mx-auto mb-2"/>
@@ -112,7 +112,7 @@ export default function ChatList() {
         <ul className="divide-y divide-gray-200">
           {chats.map((chat) => {
             const isActive = pathname === `/dashboard/chat/${chat.id}`;
-            const avatarInfo = getAvatarInfo(chat.other_participant?.username);
+            const avatarInfo = getAvatarInfo(chat.other_participant?.username || undefined);
             const lastMessageTime = chat.last_message_at ? new Date(chat.last_message_at) : new Date(chat.updated_at);
             
             let timeString;
@@ -132,13 +132,11 @@ export default function ChatList() {
                 <Link href={`/dashboard/chat/${chat.id}`} className="block p-3.5">
                   <div className="flex items-start space-x-3">
                     <div className="flex-shrink-0 relative">
-                      {chat.other_participant?.avatar_url ? (
-                        <img className="h-11 w-11 rounded-full object-cover" src={chat.other_participant.avatar_url} alt="" />
-                      ) : (
+                     
                         <span className={`h-11 w-11 rounded-full flex items-center justify-center text-white text-xl font-medium ${avatarInfo.colorClass}`}>
                             {avatarInfo.initial}
                         </span>
-                      )}
+                      
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -155,17 +153,7 @@ export default function ChatList() {
                           )}
                           {chat.last_message_content || "No messages yet"}
                         </p>
-                        <div className="flex items-center space-x-1.5 flex-shrink-0">
-                            {chat.is_muted && <SpeakerWaveIcon className="h-4 w-4 text-gray-400"/>}
-                            {chat.unread_count && chat.unread_count > 0 && (
-                                <span className="text-xs bg-green-500 text-white font-semibold rounded-full px-1.5 py-0.5 min-w-[18px] text-center">
-                                    {chat.unread_count}
-                                </span>
-                            )}
-                            {isLastMessageFromUser && !chat.unread_count && (
-                                <DoubleCheckIcon className="h-5 w-5 text-green-500" />
-                            )}
-                        </div>
+                        
                       </div>
                     </div>
                   </div>

@@ -43,10 +43,34 @@ export default function ChatRoomPage() {
     messagesEndRef.current?.scrollIntoView({ behavior });
   }, []);
 
+  type Chat = {
+  id: string;
+  chat_participants: {
+    profiles: {
+      id: string;
+      username: string;
+      avatar_url?: string;
+    };
+  }[];
+};
+
+type IncomingMessage= {
+    id: string;
+    content: string;
+    chat_id: string;
+    created_at: string;
+    sender_id: string;
+    profiles: {
+        id: string;
+        username: string;
+        avatar_url?: string;
+    }[];
+}[] | null
+
   useEffect(() => {
     if (!chatId || !user) return;
     const fetchChatInfo = async () => {
-        const { data: chatData, error: chatError } = await supabase
+        const { data: chatData, error: chatError }  : { data: Chat | null; error: any } = await supabase
             .from('chats')
             .select('id, chat_participants!inner(profiles(id, username, avatar_url))')
             .eq('id', chatId)
@@ -57,14 +81,9 @@ export default function ChatRoomPage() {
             const participants = chatData.chat_participants.map(p => p.profiles) as Profile[];
             const otherParticipants = participants.filter(p => p.id !== user.id);
             
-            let chatNameDisplay = chatData.name;
             let mainAvatar = null;
 
-            if (!chatNameDisplay && otherParticipants.length > 0) {
-                chatNameDisplay = otherParticipants.map(p => p.username || 'User').join(', ');
-            } else if (!chatNameDisplay) {
-                chatNameDisplay = "Chat"; 
-            }
+           
 
             if (otherParticipants.length === 1) { 
                 mainAvatar = otherParticipants[0].avatar_url;
@@ -72,7 +91,7 @@ export default function ChatRoomPage() {
 
             
             setChatDetails({
-                name: chatNameDisplay,
+                name: "Chat",
                 participantsList: participants.map(p => p.username || 'Unknown').slice(0, 3),
                 avatar: mainAvatar || undefined 
             });
@@ -85,9 +104,9 @@ export default function ChatRoomPage() {
     if (!chatId || !user) return;
     setLoadingMessages(true);
     const fetchMessages = async () => {
-      const { data, error } = await supabase
+      const { data, error } :{data:IncomingMessage , error:any} = await supabase
         .from('messages')
-        .select('id, content, created_at, sender_id, profiles (id, username, avatar_url)')
+        .select('id, content, chat_id, created_at, sender_id, profiles (id, username, avatar_url)')
         .eq('chat_id', chatId)
         .order('created_at', { ascending: true });
 
@@ -118,7 +137,8 @@ export default function ChatRoomPage() {
             }
             return [...prevMessages, fullMessage]; 
           });
-          if (fullMessage.sender_id !== user.id || messagesEndRef.current?.getBoundingClientRect().bottom < window.innerHeight + 200) {
+          //@ts-ignore
+          if (fullMessage.sender_id !== user.id  ||  (messagesEndRef?.current?.getBoundingClientRect()?.bottom ) < window.innerHeight + 200) {
             scrollToBottom();
           }
         }
@@ -128,7 +148,7 @@ export default function ChatRoomPage() {
   }, [chatId, user, supabase, scrollToBottom]);
 
   useEffect(() => { 
-    if (messages.length > 0 && messages[messages.length - 1].sender_id === user.id) {
+    if (messages.length > 0 && messages[messages.length - 1].sender_id === user?.id) {
         scrollToBottom();
     }
   }, [messages, user?.id, scrollToBottom]);
